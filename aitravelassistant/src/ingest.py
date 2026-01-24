@@ -43,4 +43,18 @@ async def ingest_pdf(file: UploadFile):
     texts = [chunk_r.page_content for chunk_r in chunks]
     print(texts)
     embeddings: list | Any = get_embeddings(texts)
-    return embeddings
+    print(embeddings)
+# Get the Qdrant client
+    client = get_qdrant_client()
+
+    # Prepare payloads
+    payloads = [{"text": chunk.page_content, **chunk.metadata} for chunk in chunks]
+
+    # Upload points
+    print(f"⬆️ Uploading {len(chunks)} documents to collection '{COLLECTION_NAME}'...")
+    client.upload_collection(
+        collection_name=COLLECTION_NAME,
+        vectors=embeddings,
+        payload=payloads,
+    )
+    print(f"✅ Upload complete! Added {len(chunks)} chunks from {page_count} pages")

@@ -4,16 +4,17 @@ from contextlib import asynccontextmanager
 #from openai import embeddings
 from pydantic import BaseModel
 from src.ingest import ingest_pdf
-#from src.vectorstores import init_qdrant
-#from src.generator import generate_answer
+from src.vectorstores import init_qdrant
+from src.retriever import retrieve_docs
+from src.generator import generate_answer
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Initialize resources here (e.g., database connections, models)
     # Initialize Qdrant database
-    #print("Initializing Qdrant database...")
-    #init_qdrant()
+    print("Initializing Qdrant database...")
+    init_qdrant()
     print("Database initialization complete.")   
     yield
 
@@ -24,8 +25,9 @@ class QueryRequest(BaseModel):
 
 @app.post("/ask")
 async def ask_question(req: QueryRequest):
-    #resp = generate_answer(req.query)
-    return {"response": "Your Response"}
+    resp = generate_answer(req.query)
+    #retrievedocs = await retrieve_docs(req.query)
+    return {"response": resp}
 
 @app.post("/upload")
 async def upload_file(file: UploadFile = None):
@@ -36,8 +38,8 @@ async def upload_file(file: UploadFile = None):
         return {"message": "Please upload a PDF file"}
     
     try:
-        embeddings= await ingest_pdf(file)
-        return {"message": embeddings}
+        await ingest_pdf(file)
+        return {"message": "File uploaded successfully"}
     except Exception as e:
         return {"message": f"Error processing file: {str(e)}"}
 
