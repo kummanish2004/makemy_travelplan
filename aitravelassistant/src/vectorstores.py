@@ -4,6 +4,8 @@ from src.config import QDRANT_HOST, QDRANT_API_KEY, COLLECTION_NAME
 
 
 def get_qdrant_client():
+    print(QDRANT_HOST)
+    print(QDRANT_API_KEY)
     return QdrantClient(
         url=QDRANT_HOST,
         api_key=QDRANT_API_KEY
@@ -13,11 +15,12 @@ def init_qdrant():
     # Connect to Qdrant Cloud or local
     client = get_qdrant_client()
 
+
     # Create collection if it doesn't exist
     existing_collections = [col.name for col in client.get_collections().collections]
     if COLLECTION_NAME not in existing_collections:
-        print(f"Creating collection '{COLLECTION_NAME}'...")
-        client.recreate_collection(
+        print(f'Creating collection \'{COLLECTION_NAME}\'...')
+        client.create_collection(
             collection_name=COLLECTION_NAME,
             vectors_config=VectorParams(size=384, distance=Distance.COSINE),
         )

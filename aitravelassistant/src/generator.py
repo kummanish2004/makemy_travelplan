@@ -1,5 +1,5 @@
 
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from src.retriever import retrieve_docs
 from src.config import MODEL_PROVIDER, OPENAI_API_KEY
 

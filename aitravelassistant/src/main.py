@@ -1,8 +1,11 @@
 from fastapi import FastAPI, UploadFile
 from contextlib import asynccontextmanager
+
+#from openai import embeddings
 from pydantic import BaseModel
 from src.ingest import ingest_pdf
 from src.vectorstores import init_qdrant
+from src.retriever import retrieve_docs
 from src.generator import generate_answer
 
 
@@ -23,6 +26,7 @@ class QueryRequest(BaseModel):
 @app.post("/ask")
 async def ask_question(req: QueryRequest):
     resp = generate_answer(req.query)
+    #retrievedocs = await retrieve_docs(req.query)
     return {"response": resp}
 
 @app.post("/upload")
@@ -35,7 +39,7 @@ async def upload_file(file: UploadFile = None):
     
     try:
         await ingest_pdf(file)
-        return {"message": "File processed successfully"}
+        return {"message": "File uploaded successfully"}
     except Exception as e:
         return {"message": f"Error processing file: {str(e)}"}
 
